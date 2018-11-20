@@ -125,7 +125,7 @@ async function main() {
 
 ```
 
-or if you want to you storage:
+or if you want to use storage:
 
 ```
 const MySqlContainer  = require('mysql-in-docker');
