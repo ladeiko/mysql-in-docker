@@ -1,0 +1,49 @@
+{
+  "name": "mysql-in-docker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 test/*.spec.ts",
+    "test-wtfnode": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 ---wtfnode test/*.spec.ts",
+    "lint": "tslint *.ts test/*.ts",
+    "watch": "nodemon -e ts -x \"npm run test\"",
+    "prettier": "prettier --write *.ts test/*.ts",
+    "postinstall": "niv sequelize@3.30.2 --destination sequelize3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run prettier && npm run lint && npm test"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ladeiko/mysql-in-docker.git"
+  },
+  "author": "Siarhei Ladzeika",
+  "license": "SEE LICENSE IN <LICENSE>",
+  "devDependencies": {
+    "@types/mocha": "^5.2.5",
+    "husky": "^1.1.3",
+    "lodash": "^4.17.11",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.6",
+    "prettier": "^1.15.2",
+    "should": "^13.2.3",
+    "tmp": "0.0.33",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.6",
+    "wtfnode": "^0.7.3"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.118",
+    "@types/node": "^10.12.9",
+    "mysql": "^2.16.0",
+    "mysql2": "^1.6.4",
+    "node-cleanup": "^2.1.2",
+    "npm-install-version": "^6.0.2",
+    "sequelize": "^4.41.2"
+  },
+  "readme": "# mysql-in-docker\r\n\r\n## Purpose\r\n\r\nModule starts mysql server inside docker container. This is helpful while testing.\r\n\r\n## Installation\r\n\r\n```\r\nnpm i mysql-in-docker --save\r\n```\r\n\r\n## Usage\r\n\r\n### IMySqlInDockerOptions options\r\n\r\n```\r\ninterface IMySqlInDockerOptions {\r\n\r\n  \/\/ database name to create [optional]\r\n  database?: string;\r\n\r\n  \/\/ database user name to create [optional]\r\n  user?: string;\r\n\r\n  \/\/ database user password to create [optional]\r\n  password?: string;\r\n\r\n  \/\/ if true, then sequelize v3 will be used for models [optional]\r\n  sequelizeV3?: boolean;\r\n\r\n  \/\/ use mysql v8, by default v5 is used [optional]\r\n  mysqlV8?: boolean;\r\n\r\n  \/\/ path to folder(s)\/file(s) with sequelize models [optional]\r\n  models?: string | string[];\r\n\r\n  \/\/ path with sql scripts [optional]\r\n  \/\/ this path is used when you specify 'my-query.sql' in query instead of\r\n  \/\/ sql query, module tries to locate 'my-query.sql' inside this folder\r\n  scriptsDir?: string;\r\n\r\n  \/\/ if true, all actions will be logged to console, default is false [optional]\r\n  verbose?: boolean;\r\n\r\n  \/\/ if specified, then it will be used to store mysql database after shutdown\r\n  \/\/ note: should be accessible by docker\r\n  storage?: string;\r\n}\r\n```\r\n\r\n### Methods\r\n\r\n#### constructor(options?: IMySqlInDockerOptions)\r\nConstructor\r\n\r\n#### start()\r\n\r\nStarts docker container with mysql server.\r\nIf succeeded, then ```port```, ```host```, etc. properties become available.\r\n\r\n#### stop()\r\nStops running docker container.\r\nAfter completion all ```port```, ```host```, etc. properties become unavailable.\r\n\r\n#### execSql(query: string) => \\[RowDataPacket\\]\r\n\r\nReturns method to be used to execute SQL queries. Query also can contain\r\nname of the file to be executed, e.g: my-query.sql. Returns rows.\r\n\r\n#### model(name) => SequelizeModel | undefined\r\n\r\nReturn sequelize model by name, if they where loaded from specified path(s).\r\n\r\n### Properties\r\n\r\n#### host: string | undefined\r\n\r\nReturns domain or ip of running MySql server.\r\n\r\n#### port: number | undefined\r\n\r\nReturns port MySql server is listening to.\r\n\r\n#### database: string | undefined\r\n\r\nReturns name of database.\r\n\r\n#### user: string | undefined\r\n\r\nReturns mysql user.\r\n\r\n#### password: string | undefined\r\n\r\nReturns mysql password for user.\r\n\r\n### Example\r\n\r\n```\r\nconst MySqlContainer  = require('mysql-in-docker');\r\n\r\nasync function main() {\r\n  const options = {\r\n    \/\/ See IMySqlInDockerOptions\r\n  };\r\n\r\n  \/\/ instantiate\r\n  const container = new MySqlContainer(options);\r\n\r\n  \/\/ boot\r\n  await container.start();\r\n\r\n  const port = container.port;\r\n  const host = container.host;\r\n  const database = container.database;\r\n  const user = container.user;\r\n  const password = container.password;\r\n\r\n  \/\/ do some work\r\n  ...\r\n\r\n  \/\/ shutdown\r\n  await container.stop();\r\n}\r\n\r\n```\r\n\r\nor if you want to you storage:\r\n\r\n```\r\nconst MySqlContainer  = require('mysql-in-docker');\r\n\r\nasync function main() {\r\n  const options = {\r\n    \/\/ See IMySqlInDockerOptions\r\n\r\n    storage: '\/my-path'\r\n\r\n    \/\/ we should explicitly specify database, user and password\r\n    \/\/  to be able to use it after restore\r\n    database: 'test',\r\n    user: 'test',\r\n    password: 'test',\r\n  };\r\n\r\n  \/\/ instantiate\r\n  const container = new MySqlContainer(options);\r\n\r\n  \/\/ boot\r\n  await container.start();\r\n\r\n  const port = container.port;\r\n  const host = container.host;\r\n  const database = container.database;\r\n  const user = container.user;\r\n  const password = container.password;\r\n\r\n  \/\/ do some work\r\n  ...\r\n\r\n  \/\/ shutdown\r\n  await container.stop();\r\n\r\n  \/\/ Restore after some from the same storage\r\n  await container.start();\r\n\r\n  \/\/ Work with restored database\r\n  ...\r\n\r\n  \/\/ shutdown again\r\n  await container.stop();\r\n}\r\n\r\n```\r\n\r\n## License\r\n\r\nMIT. See [LICENSE](LICENSE)\r\n\r\n## Author\r\n\r\nSiarhei Ladzeika <sergey.ladeiko@gmail.com>\r\n"
+}
