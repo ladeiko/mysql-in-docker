@@ -6,6 +6,8 @@ Module starts mysql server inside docker container. This is helpful while testin
 
 ## Installation
 
+NOTE: Docker required.
+
 ```
 npm i mysql-in-docker --save
 ```

@@ -1,8 +1,8 @@
 {
   "name": "mysql-in-docker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 test/*.spec.ts",
     "test-wtfnode": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 ---wtfnode test/*.spec.ts",
