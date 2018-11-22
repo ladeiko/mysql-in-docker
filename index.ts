@@ -3,11 +3,23 @@ const mysql = require('mysql');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
-const sequelize3Class = require('sequelize3');
+const niv = require('npm-install-version');
+
+const sequelize3Class = () => {
+  try {
+    return require('sequelize3');
+  }
+  catch (e) {
+    niv.install('sequelize@3.30.2', { destination: 'sequelize3'});
+    return require('sequelize3');
+  }
+};
+
 const sequelizeClass = require('sequelize');
 const _ = require('lodash');
 const nodeCleanup = require('node-cleanup');
 const { execSync } = require('child_process');
+
 
 interface IMySqlInDockerOptions {
   database?: string;
@@ -252,7 +264,7 @@ class MySqlContainer {
         })
         .value();
 
-      const currentSequelizeClass = this._options.sequelizeV3 ? sequelize3Class : sequelizeClass;
+      const currentSequelizeClass = this._options.sequelizeV3 ? sequelize3Class() : sequelizeClass;
 
       const sequelize = new currentSequelizeClass(options.database, options.user, options.password, options);
 

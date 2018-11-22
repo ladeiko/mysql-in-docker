@@ -32,6 +32,8 @@ interface IMySqlInDockerOptions {
   sequelizeV3?: boolean;
 
   // use mysql v8, by default v5 is used [optional]
+  // NOTE: V8 is configured to use native authentication,
+  //        because sequelize has issues with new auth method
   mysqlV8?: boolean;
 
   // path to folder(s)/file(s) with sequelize models [optional]

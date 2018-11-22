@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const os = require('os');
 const tmp = require('tmp');
 const path = require('path');
@@ -25,7 +26,7 @@ describe('mysql-in-docker', () => {
     },
     {
       sequelizeV3: false,
-      mysqlV8: true
+      mysqlV8: true,
     },
     {
       sequelizeV3: true,
@@ -76,7 +77,7 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should exec sql from string`, async () => {
-        const container = new MySqlContainer();
+        const container = new MySqlContainer(options);
         await container.start();
 
         await container.execSql(`CREATE TABLE t (c CHAR(20) CHARACTER SET utf8 COLLATE utf8_bin)`);
@@ -94,9 +95,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should exec sql from file`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           scriptsDir: path.join(__dirname, 'scripts')
-        });
+        }, options));
 
         await container.start();
 
@@ -114,9 +115,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load all models from dir`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           models: path.join(__dirname, 'models')
-        });
+        }, options));
 
         await container.start();
 
@@ -139,9 +140,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load all models from multiple dirs`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2')]
-        });
+        }, options));
 
         await container.start();
 
@@ -167,9 +168,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from files`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           models: path.join(__dirname, 'models', 'model.ts')
-        });
+        }, options));
 
         await container.start();
 
@@ -192,9 +193,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from multiple files`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           models: [path.join(__dirname, 'models', 'model.ts'), path.join(__dirname, 'models2', 'model.ts')]
-        });
+        }, options));
 
         await container.start();
 
@@ -220,9 +221,9 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from combination of dir and files`, async () => {
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2', 'model.ts')]
-        });
+        }, options));
 
         await container.start();
 
@@ -262,9 +263,9 @@ describe('mysql-in-docker', () => {
 
         // CREATE
 
-        const container = new MySqlContainer({
+        const container = new MySqlContainer(_.assign({
           storage: dirName
-        });
+        }, options));
 
         await container.start();
 
@@ -287,12 +288,12 @@ describe('mysql-in-docker', () => {
 
         // RESTORE
 
-        const anotherContainer = new MySqlContainer({
+        const anotherContainer = new MySqlContainer(_.assign({
           database: database,
           user: user,
           password: password,
           storage: dirName
-        });
+        }, options));
 
         await anotherContainer.start();
 
