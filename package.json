@@ -11,7 +11,8 @@
     "lint": "tslint *.ts test/*.ts",
     "watch": "nodemon -e ts -x \"npm run test\"",
     "prettier": "prettier --write *.ts test/*.ts",
-    "postinstall": "niv sequelize@3.30.2 --destination sequelize3"
+    "postinstall": "niv sequelize@3.30.2 --destination sequelize3",
+    "update-readme": "node -e \"var fs = require('fs');var j = JSON.parse(fs.readFileSync('./package.json'));var r = fs.readFileSync('./README.md', { encoding: 'utf8' });var d = JSON.stringify(Object.assign(j, { readme: r}), null, 2);fs.writeFileSync('./package.json', d, {encoding: 'utf8'});\""
   },
   "husky": {
     "hooks": {
