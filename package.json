@@ -1,11 +1,13 @@
 {
   "name": "mysql-in-docker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types" : "dist/index.d.ts",
   "scripts": {
-    "test": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 test/*.spec.ts",
-    "test-wtfnode": "mocha --require ts-node/register --bail --timeout 0 --slow 600000 ---wtfnode test/*.spec.ts",
+    "build": "rm -rf ./dist && tsc && cp ./Dockerfile* ./dist",
+    "test": "npm run build && mocha --require ts-node/register --bail --timeout 0 --slow 600000 test/*.spec.ts",
+    "test-wtfnode": "npm run build && mocha --require ts-node/register --bail --timeout 0 --slow 600000 ---wtfnode test/*.spec.ts",
     "lint": "tslint *.ts test/*.ts",
     "watch": "nodemon -e ts -x \"npm run test\"",
     "prettier": "prettier --write *.ts test/*.ts",
@@ -20,6 +22,10 @@
     "type": "git",
     "url": "git+https://github.com/ladeiko/mysql-in-docker.git"
   },
+  "bugs": {
+    "url": "https://github.com/ladeiko/mysql-in-docker/issues"
+  },
+  "homepage":"https://github.com/ladeiko/mysql-in-docker",
   "author": "Siarhei Ladzeika",
   "license": "SEE LICENSE IN <LICENSE>",
   "devDependencies": {

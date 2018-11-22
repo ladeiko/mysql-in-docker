@@ -103,14 +103,31 @@ class MySqlContainer {
     cleanup();
   }
 
+  /** @internal */
   private static readonly prefix = 'mysql-in-docker-';
+
+  /** @internal */
   private readonly _options: IMySqlInDockerOptions;
+
+  /** @internal */
   private readonly _dockerFileName: string;
+
+  /** @internal */
   private readonly _dockerFileHash: string;
+
+  /** @internal */
   private readonly _dockerImageName: string;
+
+  /** @internal */
   private readonly _dockerContainerName: string;
+
+  /** @internal */
   private _runtime: any = {};
+
+  /** @internal */
   private _pool: any | null = null;
+
+  /** @internal */
   private _dbOptions: any;
 
   constructor(options?: IMySqlInDockerOptions) {
@@ -148,7 +165,7 @@ class MySqlContainer {
     const modelsDir = this._options.models;
     const sqlScriptsFolder = this._options.scriptsDir;
 
-    const port = await this.startMySqlContainer();
+    const port = await this._startContainer();
 
     const connect = () => {
       return new Promise(async (resolve, reject) => {
@@ -295,7 +312,7 @@ class MySqlContainer {
     if (_.isEmpty(this._runtime)) {
       return;
     }
-    await this._stopMySqlContainer();
+    await this._stopContainer();
     if (this._pool) {
       await new Promise(resolve => {
         this._pool.end(() => {
@@ -336,11 +353,13 @@ class MySqlContainer {
     return this._runtime.password;
   }
 
+  /** @internal */
   private _validateOptions() {
     // TODO
   }
 
-  private async _stopMySqlContainer() {
+  /** @internal */
+  private async _stopContainer() {
     try {
       await run({ cmd: 'docker', args: ['stop', this._dockerContainerName] });
     } catch (e) {
@@ -353,7 +372,8 @@ class MySqlContainer {
     }
   }
 
-  private async startMySqlContainer() {
+  /** @internal */
+  private async _startContainer() {
     const port = await generateFreePort();
 
     await run({
@@ -363,7 +383,7 @@ class MySqlContainer {
       cwd: __dirname
     });
 
-    const volumes = [];
+    const volumes: any[] = [];
 
     if (this._options.storage) {
       const stat = fs.statSync(this._options.storage);

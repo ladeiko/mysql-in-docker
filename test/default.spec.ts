@@ -2,7 +2,7 @@ const os = require('os');
 const tmp = require('tmp');
 const path = require('path');
 const should = require('should');
-const MySqlContainer = require('../index'); // tslint:disable-line
+const MySqlContainer = require('..'); // tslint:disable-line
 
 tmp.setGracefulCleanup();
 
