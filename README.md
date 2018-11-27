@@ -1,4 +1,4 @@
-# mysql-in-docker
+# mysql-in-docker [![Build Status](https://travis-ci.org/ladeiko/mysql-in-docker.svg?branch=master)](https://travis-ci.org/ladeiko/mysql-in-docker)
 
 ## Purpose
 

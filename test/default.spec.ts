@@ -26,7 +26,7 @@ describe('mysql-in-docker', () => {
     },
     {
       sequelizeV3: false,
-      mysqlV8: true,
+      mysqlV8: true
     },
     {
       sequelizeV3: true,
@@ -67,6 +67,14 @@ describe('mysql-in-docker', () => {
           .be.instanceOf(String)
           .and.not.empty();
 
+        const versions = await container.execSql('SELECT VERSION()');
+        should(versions)
+          .be.Array()
+          .and.have.length(1);
+        should(versions[0]['VERSION()'])
+          .be.String()
+          .and.startWith(options.mysqlV8 ? '8.' : '5.');
+
         await container.stop();
 
         should(container.port).be.undefined();
@@ -95,9 +103,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should exec sql from file`, async () => {
-        const container = new MySqlContainer(_.assign({
-          scriptsDir: path.join(__dirname, 'scripts')
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              scriptsDir: path.join(__dirname, 'scripts')
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -115,9 +128,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load all models from dir`, async () => {
-        const container = new MySqlContainer(_.assign({
-          models: path.join(__dirname, 'models')
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: path.join(__dirname, 'models')
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -140,9 +158,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load all models from multiple dirs`, async () => {
-        const container = new MySqlContainer(_.assign({
-          models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2')]
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2')]
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -168,9 +191,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from files`, async () => {
-        const container = new MySqlContainer(_.assign({
-          models: path.join(__dirname, 'models', 'model.ts')
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: path.join(__dirname, 'models', 'model.ts')
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -193,9 +221,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from multiple files`, async () => {
-        const container = new MySqlContainer(_.assign({
-          models: [path.join(__dirname, 'models', 'model.ts'), path.join(__dirname, 'models2', 'model.ts')]
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: [path.join(__dirname, 'models', 'model.ts'), path.join(__dirname, 'models2', 'model.ts')]
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -221,9 +254,14 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should load models from combination of dir and files`, async () => {
-        const container = new MySqlContainer(_.assign({
-          models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2', 'model.ts')]
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2', 'model.ts')]
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -249,7 +287,6 @@ describe('mysql-in-docker', () => {
       });
 
       it(`should use storage`, async () => {
-
         const tmpOptions: any = {
           unsafeCleanup: true
         };
@@ -263,9 +300,14 @@ describe('mysql-in-docker', () => {
 
         // CREATE
 
-        const container = new MySqlContainer(_.assign({
-          storage: dirName
-        }, options));
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              storage: dirName
+            },
+            options
+          )
+        );
 
         await container.start();
 
@@ -288,12 +330,17 @@ describe('mysql-in-docker', () => {
 
         // RESTORE
 
-        const anotherContainer = new MySqlContainer(_.assign({
-          database: database,
-          user: user,
-          password: password,
-          storage: dirName
-        }, options));
+        const anotherContainer = new MySqlContainer(
+          _.assign(
+            {
+              database: database,
+              user: user,
+              password: password,
+              storage: dirName
+            },
+            options
+          )
+        );
 
         await anotherContainer.start();
 
@@ -309,6 +356,43 @@ describe('mysql-in-docker', () => {
         await anotherContainer.stop();
 
         dir.removeCallback();
+      });
+
+      it(`should support concurrent queries`, async () => {
+        const container = new MySqlContainer(
+          _.assign(
+            {
+              models: [path.join(__dirname, 'models'), path.join(__dirname, 'models2', 'model.ts')]
+            },
+            options
+          )
+        );
+
+        await container.start();
+
+        const test = async (i: number, model) => {
+          const name = 'a' + i;
+          await model.create({
+            name: name
+          });
+
+          const rows = await model.findAll({
+            where: {
+              name: name
+            }
+          });
+
+          should(rows)
+            .be.instanceOf(Array)
+            .and.has.length(1);
+          should(rows[0])
+            .have.property('name')
+            .and.exactly(name);
+        };
+
+        await Promise.all(_.times(2000, i => test(i, container.model(i % 2 ? 'User' : 'User2'))));
+
+        await container.stop();
       });
     });
   }
