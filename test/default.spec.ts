@@ -291,7 +291,7 @@ describe('mysql-in-docker', () => {
           unsafeCleanup: true
         };
 
-        if (os.platform() !== 'win32') {
+        if (os.platform() !== 'win32' && !('TRAVIS' in process.env && 'CI' in process.env)) {
           tmpOptions.template = '/tmp/mysql-in-docker-XXXXXXXXXXXXXXXXXX';
         }
 
