@@ -1,9 +1,13 @@
 language: node_js
 node_js:
-  - "8"
+  - "8.11.2"
 services:
   - docker
-before_script:
-  - npm install
+install:
+  - npm i -g npm@6.4.1
+  - npm ci
 script:
   - npm test
+cache:
+  directories:
+    - "node_modules"
