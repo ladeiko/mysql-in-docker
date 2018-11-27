@@ -291,7 +291,9 @@ describe('mysql-in-docker', () => {
           unsafeCleanup: true
         };
 
-        if (os.platform() !== 'win32' && !('TRAVIS' in process.env && 'CI' in process.env)) {
+        const isTravis = ('TRAVIS' in process.env && 'CI' in process.env);
+
+        if (os.platform() !== 'win32' && !isTravis) {
           tmpOptions.template = '/tmp/mysql-in-docker-XXXXXXXXXXXXXXXXXX';
         }
 
@@ -355,7 +357,17 @@ describe('mysql-in-docker', () => {
 
         await anotherContainer.stop();
 
-        dir.removeCallback();
+        if (isTravis) {
+          try {
+            dir.removeCallback();
+          } catch (e) {
+            // ignored
+            // Travis CI build fails in this place without ignoring
+          }
+        }
+        else {
+          dir.removeCallback();
+        }
       });
 
       it(`should support concurrent queries`, async () => {
