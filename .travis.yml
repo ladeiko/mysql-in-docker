@@ -1,12 +1,20 @@
 language: node_js
 node_js:
-  - "8"
+- '8'
 services:
-  - docker
+- docker
 install:
-  - npm ci
+- npm ci
 script:
-  - npm test
+- npm test
 cache:
   directories:
-    - "node_modules"
+  - node_modules
+deploy:
+  provider: npm
+  email: sergey.ladeiko@gmail.com
+  api_key:
+    secure: fIG/LZrxkCwuQkog8OsN76daC/ynHquokq7i54IdJGUChLRLXfNGGNCt+1ocDmCBhrpOlaZg/YLvc750Yst09ZfAvEEHb5A+DhfNwJLzhjaUA0PwDdViyv1acY6l5dBwBF5qi+psIR1z1U0e8Ee6Xzl/E27ySCYmJwaDFuUxmfz+wYgInCDS8xF8zHbmgTG/suATEgBDnSBatoQHk2VDihAGW7UbA0YGmY2bG+OuXuzcGrLRqFT0SrSPJcleR1M+o9mHIX9+dR9uB3W3EmThM+UINIxvTnUUl112Kn2MLHtCPNenoBaxk57RTUE8sL3DAF8Ib7HQRAjSycxOyYjTZHsjQ57Ez/p5q/zFRNWbyQOHH7BnQbRjRwPms5UtULnjXODwtkJU8a5HFY1SnvfQOVUJGmHUzmsNacKIYiqv0RdPOJu/5nlY+uaQVl334Gg8yE+HuJ58cx6+FTuKQqz2N1cbcAlsqhQLs32kavFxsbMkCRJEu4pne2E71pjT892WV3ppObiSmtWEC6HzPGxQZm3WQ1TfMq9Lff0sPlsIVCef+sY6LH1citCs6U0L6SRgpV0815ArXu7VMaxRyVTlBkv1hPWZ9gd/rr05u84Z6F8+ih+OlzzTFV/6CiZt/JtxlX9IS4WTSYuY6uv3rVROHg/v0hiLCUZbhaxejov4Zm8=
+  on:
+    tags: true
+  skip_cleanup: true
