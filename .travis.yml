@@ -4,7 +4,7 @@ node_js:
 services:
 - docker
 install:
-- npm ci
+- npm install
 script:
 - npm test
 cache:
